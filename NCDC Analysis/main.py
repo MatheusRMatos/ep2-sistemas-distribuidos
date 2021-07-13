@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
-from pyspark import SparkFiles
-from pyspark.context import SparkContext
+from ETL.Extract import *
+from ETL.Transform import *
 
 spark = SparkSession \
     .builder \
@@ -10,12 +10,17 @@ spark = SparkSession \
 
 print("Script inicializado... \n")
 
-# Read all csv files from a directory
-df = spark.read.option("header",True).csv("assets/samples/import/")
-df.show()
+df = readData(spark)
+df = transformColumns(df)
 
-print("O dataframe agora tem ",df.count()," linhas e ", len(df.columns), "colunas. \n")
-
-# Export dataframe to csv file
-# Para escrever em um arquivo: coalesce(1), (não tem paralelismo)
-df.write.csv("assets/samples/export/data.csv")
+# df.printSchema()
+df.show(5)
+# print("O dataframe agora tem ",df.count()," linhas e ", len(df.columns), "colunas. \n")
+df = transformData(df)
+df.show(5)
+'''
+print("Digite a coluna que deseja agrupar: ")
+campo = input()
+'''
+# print(df.filter(df["TEMP_ATTRIBUTES"] == "24").show())
+# print(df.groupBy(campo).count().orderBy("count", ascending=True).show())
