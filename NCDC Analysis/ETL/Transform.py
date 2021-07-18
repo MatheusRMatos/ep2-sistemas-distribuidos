@@ -7,8 +7,7 @@ Arquivo de Transformação dos dados do DataFrame:
         + Transformar dados
         - Tratar dos casos especiais
     - Padronização dos reesultados para análise
-    - Transformação dos tipos de colunas
-    
+    - Transformação dos tipos de colunas 
 '''
 
 # Transforma colunas String nos tipos adequados, chamado antes do renameColumns()

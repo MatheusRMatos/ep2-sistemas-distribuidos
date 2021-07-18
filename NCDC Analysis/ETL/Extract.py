@@ -6,3 +6,6 @@ Criação do DataFrame que será utilizado com todos os dados consolidados
 # Read all csv files from a directory
 def readData(spark):
     return spark.read.option("header", True).csv("assets/samples/import/")
+
+def readSampleDate(spark):
+    return spark.read.option("header", True).csv("assets/sample.csv")
