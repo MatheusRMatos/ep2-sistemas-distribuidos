@@ -57,7 +57,7 @@ def transformData(df):
 # Transforma colunas String nos tipos adequados
 def renameColumns(df):
     df = df.withColumnRenamed("STATION", "CÓDIGO ESTAÇÃO") \
-        .withColumnRenamed("DATE", "DATA") \
-        .withColumnRenamed("ELEVATION", "ALTITUDE") \
-        .withColumnRenamed("NAME", "NOME")
+           .withColumnRenamed("DATE", "DATA") \
+           .withColumnRenamed("ELEVATION", "ALTITUDE") \
+           .withColumnRenamed("NAME", "NOME")
     return df

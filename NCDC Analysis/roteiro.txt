@@ -1,0 +1,59 @@
+Bom dia!
+
+Informe o diretório onde estão contido os dados
+> User informa o DIRETÓRIO
+
+Informe os anos entre 1929 e 2011 que gostaria de fazer a análise separado por vírgula
+> 1929, 1930...
+
+A partir daqui, escolha o que deseja analisar
+
+1. Média
+2. Moda
+3. Desvio Padrão
+3. Variância
+4. Gerar gráficos
+5. Método dos Quadrados Mínimos
+
+Do 1 ao 3 fazer:
+
+- Informe a coluna que deseja analisar : Colunas Disponívieis: ...
+> usuário informa a coluna, se n existir repete a pergunta
+
+- Informe a data inicial que deseja realiar a análise no formato yyyy-mm-dd
+> usuário informa a data, se for inválida repete a pergunta
+
+- Informe a data final que deseja realiar a análise no formato yyyy-mm-dd
+> usuário informa a data, se for inválida repete a pergunta
+
+- Exibe para o usuário o resultado
+
+Se 4, fazer:
+- Informe a coluna que deseja analisar : Colunas Disponívieis: ...
+> usuário informa a coluna, se n existir repete a pergunta
+
+- Informe a data inicial que deseja realiar a análise no formato yyyy-mm-dd
+> usuário informa a data, se for inválida repete a pergunta
+
+- Informe a data final que deseja realiar a análise no formato yyyy-mm-dd
+> usuário informa a data, se for inválida repete a pergunta
+
+- Informe o tipo de agrupamento que deve-se realizar:
+> Por ano, por mês, por dia da semana
+
+- Gera gráfico na pasta para o usuário
+
+5, fazer:
+- Informe a coluna que deseja analisar : Colunas Disponívieis: ...
+> usuário informa a coluna, se n existir repete a pergunta
+
+- Informe a data inicial que deseja realiar a análise no formato yyyy-mm-dd
+> usuário informa a data, se for inválida repete a pergunta
+
+- Informe a data final que deseja realiar a análise no formato yyyy-mm-dd
+> usuário informa a data, se for inválida repete a pergunta
+
+- Informe a coluna do eixo X
+- Informe a coluna do eixo Y
+
+> Gera fórmula e gráfico para o usuário com os dados especificados
