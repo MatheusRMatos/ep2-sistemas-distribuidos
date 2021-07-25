@@ -152,15 +152,6 @@ def handle_variance_calc():
 
     variance(data_frame, column_name, start_date, end_date).show()
 
-def handle_variance_calc():
-    global data_frame
-    
-    column_name = input("Informe a coluna que deseja analisar: ")
-
-    start_date, end_date = request_start_end_dates()
-
-    variance(data_frame, column_name, start_date, end_date).show()
-
 def handle_median_calc():
     global data_frame
     
