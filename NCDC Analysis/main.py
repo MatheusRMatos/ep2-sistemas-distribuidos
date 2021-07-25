@@ -9,6 +9,7 @@ from Statistic.Statistic import *
 from Statistic.Descritive import *
 import os
 from datetime import datetime
+from matplotlib import pyplot as plt
 
 spark = SparkSession \
     .builder \
@@ -29,17 +30,90 @@ def print_menu():
     return int(input())
 
 def print_graph_type_menu():
+    print("Selecione o tipo de gráfico: \n")
     print("1. Gráfico de Barras")
     print("2. Gráfico de Linha")
     print("3. Gráfico de Dispersão")
+    return int(input())
+
 
 def print_graph_group_menu():
-    print("1. Agrupar por dia da semana")
-    print("2. Agrupar por mes")
-    print("3. Agrupar por ano")
+    print("Selecione o tipo de agrupamento: \n")
+    print("1. Agrupar por mes")
+    print("2. Agrupar por ano")
+    return int(input())
 
-def print_graph_value_menu():
-    print("1. Média")
+def handle_graph_generator():
+    global data_frame
+
+    graph_type = print_graph_type_menu()
+    fig, ax = plt.subplots()
+
+    if graph_type == 1:
+        #Gráfico de linha
+        column_name = input("Informe a coluna que deseja analisar: ")
+        
+        graph_group_type = print_graph_group_menu()
+        
+        if graph_group_type == 1:
+            #Agrupar por mês
+            graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+
+            ax.plot(graph_result["Date"], graph_result[column_name])
+            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_line_month_mean.png")
+            pass
+        elif graph_group_type == 2:
+            #Agrupar por ano
+            graph_result = df.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+
+            ax.plot(graph_result["Date"], graph_result[column_name])
+            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_line_year_mean.png")
+            pass
+        pass
+    elif graph_type == 2:
+        #Gráfico de barras
+        column_name = input("Informe a coluna que deseja analisar: ")
+        
+        graph_group_type = print_graph_group_menu()
+        
+        if graph_group_type == 1:
+            #Agrupar por mês
+            graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+
+            ax.bar(graph_result["Date"], graph_result[column_name])
+            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_bar_month_mean.png")
+            pass
+        elif graph_group_type == 2:
+            #Agrupar por ano
+            graph_result = df.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+
+            ax.bar(graph_result["Date"], graph_result[column_name])
+            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_bar_year_mean.png")
+            pass
+        pass                
+    elif graph_type == 3:
+        #Gráfico de dispersão
+        x_column_name = input("Informe a coluna que deseja analisar no eixo X: ")
+        y_column_name = input("Informe a coluna que deseja analisar no eixo Y: ")
+        
+        graph_group_type = print_graph_group_menu()
+        if graph_group_type == 1:
+            #Agrupar por mês
+            x_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(x_column_name).alias(x_column_name)).orderBy("Date").toPandas()
+            y_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
+            
+            ax.scatter(x_graph_result[x_column_name], y_graph_result[x_column_name])
+            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_scatter_month_mean.png")
+            pass
+        elif graph_group_type == 2:
+            #Agrupar por ano
+            x_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(x_column_name).alias(x_column_name)).orderBy("Date").toPandas()
+            y_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
+            
+            ax.scatter(x_graph_result[x_column_name], y_graph_result[x_column_name])
+            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_scatter_month_mean.png")
+            pass
+        pass    
 
 def request_start_end_dates():
     start_date_str = input("Informe a data de início no formato dd/mm/yyyy: ")
@@ -49,6 +123,7 @@ def request_start_end_dates():
     end_date = datetime.strptime(end_date_str, '%d/%m/%Y')
 
     return start_date, end_date
+
 
 def handle_mean_calc():
     global data_frame
@@ -96,6 +171,9 @@ def handle_median_calc():
     print(f"Mediana: {median(data_frame, column_name, start_date, end_date)}") 
 
 
+
+
+
 print("Bem vindo! ")
 
 print("Informe os anos em que gostaria de fazer a análise")
@@ -132,7 +210,8 @@ while(menu_item != 9):
         handle_variance_calc()
         menu_item = print_menu()
     elif menu_item == 5:
-        #Gerar Gráficos....            
+        #Gerar Gráficos....       
+        handle_graph_generator()
         menu_item = print_menu()
     elif menu_item == 6:
         #Aplicar Método dos Quadrados Mínimos para predição            
