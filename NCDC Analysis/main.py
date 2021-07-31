@@ -60,14 +60,16 @@ def handle_graph_generator():
             graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.plot(graph_result["Date"], graph_result[column_name])
-            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_line_month_mean.png")
+            stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
+            fig.imsave(f"{stringDate}_line_month_mean.png")
             pass
         elif graph_group_type == 2:
             #Agrupar por ano
             graph_result = df.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.plot(graph_result["Date"], graph_result[column_name])
-            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_line_year_mean.png")
+            stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
+            fig.imsave(f"{stringDate}_line_year_mean.png")
             pass
         pass
     elif graph_type == 2:
@@ -81,14 +83,16 @@ def handle_graph_generator():
             graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.bar(graph_result["Date"], graph_result[column_name])
-            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_bar_month_mean.png")
+            stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
+            fig.imsave(f"{stringDate}_bar_month_mean.png")
             pass
         elif graph_group_type == 2:
             #Agrupar por ano
             graph_result = df.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.bar(graph_result["Date"], graph_result[column_name])
-            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_bar_year_mean.png")
+            stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
+            fig.imsave(f"{stringDate}_bar_year_mean.png")
             pass
         pass                
     elif graph_type == 3:
@@ -103,7 +107,8 @@ def handle_graph_generator():
             y_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
             
             ax.scatter(x_graph_result[x_column_name], y_graph_result[x_column_name])
-            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_scatter_month_mean.png")
+            stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
+            fig.imsave(f"{stringDate}_scatter_month_mean.png")
             pass
         elif graph_group_type == 2:
             #Agrupar por ano
@@ -111,7 +116,8 @@ def handle_graph_generator():
             y_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
             
             ax.scatter(x_graph_result[x_column_name], y_graph_result[x_column_name])
-            fig.imsave(f"{datetime.today().strftime("%d-%m-%Y-%H-%M-%S")}_scatter_month_mean.png")
+            stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
+            fig.imsave(f"{stringDate}_scatter_month_mean.png")
             pass
         pass    
 
