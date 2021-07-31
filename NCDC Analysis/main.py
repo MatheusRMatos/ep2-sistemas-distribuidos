@@ -22,6 +22,8 @@ spark = SparkSession \
     .appName("Ep 2") \
     .getOrCreate()
 
+spark.sparkContext.setLogLevel("ERROR")
+
 def print_menu():
     print("Selecione um item do menu: \n")
     print("0. Reler base de dados")
@@ -177,10 +179,10 @@ def handle_median_calc():
 def handle_mmq():
     global data_frame
 
-    start_date, end_date = datetime(1971, 1, 1), datetime(1971, 10, 1) #request_start_end_dates()
+    start_date, end_date = request_start_end_dates()
 
-    x_column_name = "TEMP" #input("Informe a coluna que deseja analisar no eixo X: ")
-    y_column_name = "SLP" #input("Informe a coluna que deseja analisar no eixo Y: ")    
+    x_column_name = input("Informe a coluna que deseja analisar no eixo X: ")
+    y_column_name = input("Informe a coluna que deseja analisar no eixo Y: ")    
 
     print("Carregando dados...")
 
@@ -247,7 +249,7 @@ def handle_predict():
         else:
             stop = True
 
-print("Bem vindo! ")
+print("\n\nBem vindo! ")
 
 print("Informe os anos em que gostaria de fazer a análise")
 start_year = int(input("Ano inicial: "))
@@ -259,6 +261,7 @@ years_list = list(filter(lambda x: int(x) in range(start_year, end_year), os.lis
 
 print("Carregando dados...")
 data_frame = spark.read.option("header", True).csv([ f"assets/raw/{x}/*.csv" for x in years_list ])
+print("\n\n")
 
 menu_item = print_menu()
 
@@ -296,6 +299,8 @@ while(menu_item != 9):
         menu_item = print_menu()
     elif menu_item == 8:
         #Listar colunas e tipos de dados
+        for field in data_frame.schema.fields:
+            print(f"{field.name} -> {field.dataType}") 
         menu_item = print_menu()
     elif menu_item == 9:
         pass
@@ -303,31 +308,3 @@ while(menu_item != 9):
         pass
 
 print("Saindo do sistema...")
-
-# print("Script inicializado... \n")
-
-# data_frame = readSampleDate(spark)
-# df = transformColumns(df)
-
-# df = transformData(df)
-# # df = df.withColumn("TEMP", when(df.TEMP == 17.89, 231546).otherwise(df.TEMP))
-# df.show(5)
-# '''
-# print("Digite a coluna que deseja agrupar: ")
-# campo = input()
-# '''
-# # print(df.filter(df["SLP"] >= 9999.9).show())
-# # print(df.groupBy(campo).count().orderBy("count", ascending=True).show())
-# '''
-# df_stats = df.select(
-#     F.mean(F.col('TEMP')).alias('mean'),
-#     F.stddev(F.col('TEMP')).alias('std')
-# ).collect()
-
-# mean = df_stats[0]['mean']
-# std = df_stats[0]['std']
-# '''
-
-# print("A média é: ", media(df,'TEMP'))
-# print("O desvio é: ", desvioPadrao(df, 'TEMP'))
-# print("A mediana é: ", mediana(df, 'TEMP'))
