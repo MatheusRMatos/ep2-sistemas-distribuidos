@@ -25,7 +25,7 @@ spark = SparkSession \
 spark.sparkContext.setLogLevel("ERROR")
 
 def print_menu():
-    print("Selecione um item do menu: \n")
+    print("\n\nSelecione um item do menu: \n")
     print("0. Reler base de dados")
     print("1. Calcular Média")
     print("2. Calcular Mediana")
@@ -300,7 +300,7 @@ while(menu_item != 9):
     elif menu_item == 8:
         #Listar colunas e tipos de dados
         for field in data_frame.schema.fields:
-            print(f"{field.name} -> {field.dataType}") 
+            print(f"{field.name} -> {field.dataType}")        
         menu_item = print_menu()
     elif menu_item == 9:
         pass
