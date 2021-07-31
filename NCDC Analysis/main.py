@@ -9,9 +9,13 @@ from Statistic.Statistic import *
 from Statistic.Descritive import *
 import os
 from datetime import datetime
+import matplotlib as mpl
 from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from joblib import dump as model_dump, load as model_load
+from pyspark.sql.functions import mean as _mean, stddev as _stddev,count as _count, col, variance as _variance
+
+mpl.rcParams['agg.path.chunksize'] = 100000
 
 spark = SparkSession \
     .builder \
@@ -60,19 +64,19 @@ def handle_graph_generator():
         
         if graph_group_type == 1:
             #Agrupar por mês
-            graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+            graph_result = data_frame.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.plot(graph_result["Date"], graph_result[column_name])
             stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
-            fig.imsave(f"{stringDate}_line_month_mean.png")
+            fig.savefig(f"{stringDate}_line_month_mean.png")
             pass
         elif graph_group_type == 2:
             #Agrupar por ano
-            graph_result = df.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+            graph_result = data_frame.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.plot(graph_result["Date"], graph_result[column_name])
             stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
-            fig.imsave(f"{stringDate}_line_year_mean.png")
+            fig.savefig(f"{stringDate}_line_year_mean.png")
             pass
         pass
     elif graph_type == 2:
@@ -83,19 +87,19 @@ def handle_graph_generator():
         
         if graph_group_type == 1:
             #Agrupar por mês
-            graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+            graph_result = data_frame.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.bar(graph_result["Date"], graph_result[column_name])
             stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
-            fig.imsave(f"{stringDate}_bar_month_mean.png")
+            fig.savefig(f"{stringDate}_bar_month_mean.png")
             pass
         elif graph_group_type == 2:
             #Agrupar por ano
-            graph_result = df.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
+            graph_result = data_frame.groupBy(F.year(col("Date")).alias("Date") ).agg(_mean(column_name).alias(column_name)).orderBy("Date").toPandas()
 
             ax.bar(graph_result["Date"], graph_result[column_name])
             stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
-            fig.imsave(f"{stringDate}_bar_year_mean.png")
+            fig.savefig(f"{stringDate}_bar_year_mean.png")
             pass
         pass                
     elif graph_type == 3:
@@ -106,21 +110,21 @@ def handle_graph_generator():
         graph_group_type = print_graph_group_menu()
         if graph_group_type == 1:
             #Agrupar por mês
-            x_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(x_column_name).alias(x_column_name)).orderBy("Date").toPandas()
-            y_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
+            x_graph_result = data_frame.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(x_column_name).alias(x_column_name)).orderBy("Date").toPandas()
+            y_graph_result = data_frame.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
             
             ax.scatter(x_graph_result[x_column_name], y_graph_result[x_column_name])
             stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
-            fig.imsave(f"{stringDate}_scatter_month_mean.png")
+            fig.savefig(f"{stringDate}_scatter_month_mean.png")
             pass
         elif graph_group_type == 2:
             #Agrupar por ano
-            x_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(x_column_name).alias(x_column_name)).orderBy("Date").toPandas()
-            y_graph_result = df.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
+            x_graph_result = data_frame.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(x_column_name).alias(x_column_name)).orderBy("Date").toPandas()
+            y_graph_result = data_frame.groupBy(F.month(col("Date")).alias("Date") ).agg(_mean(y_column_name).alias(y_column_name)).orderBy("Date").toPandas()
             
             ax.scatter(x_graph_result[x_column_name], y_graph_result[x_column_name])
             stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
-            fig.imsave(f"{stringDate}_scatter_month_mean.png")
+            fig.savefig(f"{stringDate}_scatter_month_mean.png")
             pass
         pass    
 
@@ -173,10 +177,10 @@ def handle_median_calc():
 def handle_mmq():
     global data_frame
 
-    start_date, end_date = request_start_end_dates()
+    start_date, end_date = datetime(1971, 1, 1), datetime(1971, 10, 1) #request_start_end_dates()
 
-    x_column_name = input("Informe a coluna que deseja analisar no eixo X: ")
-    y_column_name = input("Informe a coluna que deseja analisar no eixo Y: ")    
+    x_column_name = "TEMP" #input("Informe a coluna que deseja analisar no eixo X: ")
+    y_column_name = "SLP" #input("Informe a coluna que deseja analisar no eixo Y: ")    
 
     print("Carregando dados...")
 
@@ -190,22 +194,22 @@ def handle_mmq():
     model.fit(data[[x_column_name]], data[[y_column_name]])
 
     a = model.intercept_[0]
-    b = model.coef_[0, 0]
+    b = model.coef_
 
     print("Treinamento finalizado...")
 
     print(f"O valor do intecept (a) é {a}")
-    print(f"O valor do coeficiente (b) é {b}")
+    print(f"O valor do coeficiente (b) é {b[0, 0]}")
     function = lambda x : a + b*x
-    print(f"A fórmula para a regressão linear para x: {x_column_name} e y: {y_column_name} é f(x)={a} + {b}*x")       
+    print(f"A fórmula para a regressão linear para x: {x_column_name} e y: {y_column_name} é f(x)={a} + {b[0, 0]}*x")       
     
     fig, ax = plt.subplots()
-    ax.plot(data[[x_column_name]], function(data[[x_column_name]]), c='red')
-    ax.scatter(data[[x_column_name]], data[[y_column_name]])
+    ax.plot(data[x_column_name], [a + b[0, 0]*float(x) for x in data[x_column_name].to_numpy()], c='red')
+    ax.scatter(data[x_column_name], data[y_column_name])
     
     stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
     graph_name = f"{stringDate}_mmq.png"
-    fig.imsave(graph_name)
+    fig.savefig(graph_name)
 
     print(f"O gráfico foi salvo em: {graph_name}")
 
@@ -221,7 +225,7 @@ def handle_predict():
 
     while(model == None):
         model_path = input("Informe a localização do arquivo do modelo: ")
-        model = model_dump(model_path)
+        model = model_load(model_path)
 
         if(model == None):
             print("Modelo não encontrado ou não carregado corretamente, tente novamente.\n")
@@ -232,7 +236,7 @@ def handle_predict():
 
         x_value = int(input("Informe o valor da variável do eixo X: "))
 
-        predction = model.predict([x_value])
+        predction = model.predict([[x_value]])
 
         print(f"O valor previsto foi: {predction[0, 0]}")
 
@@ -302,7 +306,7 @@ print("Saindo do sistema...")
 
 # print("Script inicializado... \n")
 
-# df = readSampleDate(spark)
+# data_frame = readSampleDate(spark)
 # df = transformColumns(df)
 
 # df = transformData(df)
