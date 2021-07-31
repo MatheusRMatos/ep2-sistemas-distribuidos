@@ -14,8 +14,7 @@ from matplotlib import pyplot as plt
 from sklearn.linear_model import LinearRegression
 from joblib import dump as model_dump, load as model_load
 from pyspark.sql.functions import mean as _mean, stddev as _stddev,count as _count, col, variance as _variance
-
-mpl.rcParams['agg.path.chunksize'] = 100000
+import numpy as np
 
 spark = SparkSession \
     .builder \
@@ -179,16 +178,19 @@ def handle_median_calc():
 def handle_mmq():
     global data_frame
 
-    start_date, end_date = request_start_end_dates()
+    start_date, end_date = datetime(1971, 1, 1), datetime(1971, 10, 1)
 
     x_column_name = input("Informe a coluna que deseja analisar no eixo X: ")
     y_column_name = input("Informe a coluna que deseja analisar no eixo Y: ")    
+
+    number_of_samples = int(input("Informe o número de amostras para o cálculo da regressão: "))
 
     print("Carregando dados...")
 
     data = data_frame.filter((col("DATE") >= start_date) & \
                              (col("DATE") <= end_date)) \
-                     .select(x_column_name, y_column_name).toPandas()
+                     .select(x_column_name, y_column_name) \
+                     .toPandas().sample(n = number_of_samples).astype(np.float32).sort_values(by=[x_column_name])
 
     print("Treinando modelo...")
 
@@ -202,13 +204,13 @@ def handle_mmq():
 
     print(f"O valor do intecept (a) é {a}")
     print(f"O valor do coeficiente (b) é {b[0, 0]}")
-    function = lambda x : a + b*x
+    function = lambda x : a + b[0,0]*x
     print(f"A fórmula para a regressão linear para x: {x_column_name} e y: {y_column_name} é f(x)={a} + {b[0, 0]}*x")       
     
     fig, ax = plt.subplots()
-    ax.plot(data[x_column_name], [a + b[0, 0]*float(x) for x in data[x_column_name].to_numpy()], c='red')
     ax.scatter(data[x_column_name], data[y_column_name])
-    
+    ax.plot(data[x_column_name], function(data[x_column_name].to_numpy().astype(np.float)), c='red', label=f"f(x)={a} + {b[0, 0]}*x")
+
     stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
     graph_name = f"{stringDate}_mmq.png"
     fig.savefig(graph_name)
