@@ -2,3 +2,6 @@ pyspark
 pandas
 numpy
 matplotlib
+sklearn
+joblib
+findspark

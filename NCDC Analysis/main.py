@@ -10,6 +10,8 @@ from Statistic.Descritive import *
 import os
 from datetime import datetime
 from matplotlib import pyplot as plt
+from sklearn.linear_model import LinearRegression
+from joblib import dump as model_dump, load as model_load
 
 spark = SparkSession \
     .builder \
@@ -25,7 +27,8 @@ def print_menu():
     print("4. Calcular Variância")
     print("5. Gerar gráficos")
     print("6. Aplicar Método dos Quadrados Mínimos para predição")
-    print("7. Exibir tabela")
+    print("7. Carregar modelo de predição e realizar previsões")
+    print("8. Listar colunas e tipos de dados")
     print("9. Sair")
     return int(input())
 
@@ -167,9 +170,78 @@ def handle_median_calc():
 
     print(f"Mediana: {median(data_frame, column_name, start_date, end_date)}") 
 
+def handle_mmq():
+    global data_frame
 
+    start_date, end_date = request_start_end_dates()
 
+    x_column_name = input("Informe a coluna que deseja analisar no eixo X: ")
+    y_column_name = input("Informe a coluna que deseja analisar no eixo Y: ")    
 
+    print("Carregando dados...")
+
+    data = data_frame.filter((col("DATE") >= start_date) & \
+                             (col("DATE") <= end_date)) \
+                     .select(x_column_name, y_column_name).toPandas()
+
+    print("Treinando modelo...")
+
+    model = LinearRegression()
+    model.fit(data[[x_column_name]], data[[y_column_name]])
+
+    a = model.intercept_[0]
+    b = model.coef_[0, 0]
+
+    print("Treinamento finalizado...")
+
+    print(f"O valor do intecept (a) é {a}")
+    print(f"O valor do coeficiente (b) é {b}")
+    function = lambda x : a + b*x
+    print(f"A fórmula para a regressão linear para x: {x_column_name} e y: {y_column_name} é f(x)={a} + {b}*x")       
+    
+    fig, ax = plt.subplots()
+    ax.plot(data[[x_column_name]], function(data[[x_column_name]]), c='red')
+    ax.scatter(data[[x_column_name]], data[[y_column_name]])
+    
+    stringDate = datetime.today().strftime("%d-%m-%Y-%H-%M-%S")
+    graph_name = f"{stringDate}_mmq.png"
+    fig.imsave(graph_name)
+
+    print(f"O gráfico foi salvo em: {graph_name}")
+
+    saveModel = input("Gostaria de salvar o modelo atual para uso futuro? (S/N): ")
+    if(saveModel == 'S'):
+        model_path = f"model/{stringDate}_mmq_{x_column_name}_{y_column_name}.joblib"
+        model_dump(model, model_path)
+        print(f"Seu modelo foi salvo em {model_path}")
+
+def handle_predict():
+
+    model = None
+
+    while(model == None):
+        model_path = input("Informe a localização do arquivo do modelo: ")
+        model = model_dump(model_path)
+
+        if(model == None):
+            print("Modelo não encontrado ou não carregado corretamente, tente novamente.\n")
+    
+    stop = False
+
+    while(stop == False):
+
+        x_value = int(input("Informe o valor da variável do eixo X: "))
+
+        predction = model.predict([x_value])
+
+        print(f"O valor previsto foi: {predction[0, 0]}")
+
+        new_predction = input("Gostaria de realizar uma nova predição? (S/N): ")
+
+        if(new_predction == "S"):
+            pass
+        else:
+            stop = True
 
 print("Bem vindo! ")
 
@@ -181,7 +253,7 @@ base_dir = "assets/raw"
 
 years_list = list(filter(lambda x: int(x) in range(start_year, end_year), os.listdir(base_dir)))
 
-print("CARREGANDO DADOS")
+print("Carregando dados...")
 data_frame = spark.read.option("header", True).csv([ f"assets/raw/{x}/*.csv" for x in years_list ])
 
 menu_item = print_menu()
@@ -211,13 +283,15 @@ while(menu_item != 9):
         handle_graph_generator()
         menu_item = print_menu()
     elif menu_item == 6:
-        #Aplicar Método dos Quadrados Mínimos para predição            
+        #Aplicar Método dos Quadrados Mínimos para predição
+        handle_mmq()
         menu_item = print_menu()
     elif menu_item == 7:
-        #Exibir dataframe
+        #Carregar modelo de predição e realizar previsões
+        handle_predict()
         menu_item = print_menu()
     elif menu_item == 8:
-        #Nada aqui por enquanto
+        #Listar colunas e tipos de dados
         menu_item = print_menu()
     elif menu_item == 9:
         pass
